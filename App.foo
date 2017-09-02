@@ -1,0 +1,82 @@
+import java.util.Set;
+import java.util.HashSet;
+import com.google.common.reflect.ClassPath;
+import app.controllers.ApplicationController;
+
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+
+import javax.ws.rs.core.Application;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.Path;
+import javax.ws.rs.GET;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
+import java.util.Arrays;
+
+
+@ApplicationPath("/")
+public class App extends Application {
+  public App() {
+    super();
+  }
+
+  @Path("/")
+  public static class Base {
+
+    @Path("/{path}/{path}")
+    @GET
+    public Response fallback(@Context HttpServletRequest req, @Context UriInfo ui) {
+      System.out.println("fallback handler called");
+      System.out.println("--");
+      System.out.println("getPathInfo: " + req.getPathInfo());
+      System.out.println("getRequestURI: " + req.getRequestURI());
+      ui.getPathSegments().forEach((ps) -> {
+        System.out.println(ps.getPath());
+      });
+      System.out.println("--");
+      ui.getPathParameters().forEach((k,v) -> {
+        System.out.println(k + " :: " + v);
+        for(String s : v) {
+          System.out.println("value: " + s);
+        }
+      });
+      System.out.println("--");
+      req.getParameterMap().forEach((k,v) -> {
+        System.out.println(k + " :: " + Arrays.toString(v));
+      });
+      System.out.println("=====");
+      return Response.ok().build();
+    }
+  }
+
+  @Override
+  public Set<Class<?>> getClasses() {
+    Set<Class<?>> s = new HashSet<Class<?>>();
+    s.add(Base.class);
+
+    System.out.println("Start controller search");
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    try {
+      for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
+        if (info.getName().startsWith("app.controllers.")) {
+          final Class<?> controller = info.load();
+          if ( controller != ApplicationController.class ) {
+            System.out.println("Found controller: " + controller);
+            s.add(controller);
+          }
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    System.out.println("End controller search");
+    return s;
+  }
+}
+

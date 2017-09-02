@@ -1,0 +1,73 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+
+mainClassName = "Main"
+
+repositories {
+  maven {
+    url "https://repo1.maven.org/maven2"
+  }
+}
+
+dependencies {
+
+  compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '+'
+  compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '+'
+
+  compile group: 'io.undertow', name: 'undertow-core', version: '+'
+  compile group: 'io.undertow', name: 'undertow-servlet', version: '+'
+
+  compile group: 'org.jboss.resteasy', name: 'resteasy-jaxrs', version: '+'
+  compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '+'
+
+  compile group: 'com.google.guava', name: 'guava', version: '+'
+  compile group: 'com.auth0', name: 'java-jwt', version: '+'
+  compile group: 'com.github.spullara.mustache.java', name: 'compiler', version: '+'
+
+  compile group: 'org.hibernate', name: 'hibernate-core', version: '5.1.0.Final'
+  compile group: 'com.h2database', name: 'h2', version: '+'
+
+  compile group: 'de.svenkubiak', name: 'jBCrypt', version: '+'
+
+  compile group: 'com.google.code.gson', name: 'gson', version: '+'
+
+  compile group: 'net.bytebuddy', name: 'byte-buddy', version: '+'
+  compile group: 'org.objenesis', name: 'objenesis', version: '+'
+
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs = ["./"]
+      excludes = ['vendor', 'static']
+    }
+
+    resources {
+      srcDirs = ['res', 'static']
+    }
+  }
+}
+
+allprojects {
+  gradle.projectsEvaluated {
+    tasks.withType(JavaCompile) {
+      options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+    [ compileJava, compileTestJava ]*.options*.encoding = 'UTF-8'
+  }
+}
+
+// $ gradle fatJar
+// $ java -jar build/libs/ujax-all.jar
+// $ java -Dlog4j.configurationFile=debug.properties -jar build/libs/ujax-all.jar
+task fatJar(type: Jar) {
+  manifest {
+        attributes 'Main-Class': 'Main'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}

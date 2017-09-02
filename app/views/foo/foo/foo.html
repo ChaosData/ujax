@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+  </head>
+  <body>
+    <h1>Hello foo {{name}}!</h1>
+    <p>
+      How are you doing today?
+    </p>
+    <p>
+      {{func}}
+    </p>
+    <p>
+      {{{func}}}
+    </p>
+    <p>
+      {{#func}}
+        Testing {{name}}!
+      {{/func}}
+    </p>
+    <p>
+      {{func2}}
+    </p>
+    <p>
+      {{{func2}}}
+    </p>
+    <p>
+      {{#func2}}
+        Testing {{name}}!
+      {{/func2}}
+    </p>
+    {{> ../../layouts/footer}}
+  </body>
+</html>

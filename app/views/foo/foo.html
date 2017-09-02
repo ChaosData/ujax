@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+  </head>
+  <body>
+    <h1>Hello {{name}}!</h1>
+    <p>
+      How are you doing today?
+    </p>
+    <form action="" method="post">
+      <input type="text" name="text">
+      <input type="hidden" name="csrf_token" value="{{csrf_token}}">
+      <input type="hidden" name="_method" value="PUT">
+    </form>
+    {{> ../layouts/footer}}
+  </body>
+</html>
